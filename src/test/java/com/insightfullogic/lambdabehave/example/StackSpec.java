@@ -2,12 +2,15 @@ package com.insightfullogic.lambdabehave.example;
 
 import com.insightfullogic.lambdabehave.JunitSuiteRunner;
 import org.junit.runner.RunWith;
+import com.insightfullogic.lambdabehave.ScalaTestWrapper;
+import org.scalatest.WrapWith;
 
 import java.util.Stack;
 
 import static com.insightfullogic.lambdabehave.Suite.describe;
 
 @RunWith(JunitSuiteRunner.class)
+@WrapWith(ScalaTestWrapper.class)
 public class StackSpec {{
 
     Stack<Integer> stack = new Stack<>();

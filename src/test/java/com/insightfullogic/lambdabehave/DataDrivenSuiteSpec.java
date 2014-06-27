@@ -5,6 +5,7 @@ import com.insightfullogic.lambdabehave.impl.reports.SuiteReport;
 import com.insightfullogic.lambdabehave.specifications.ThreeColumnDataSpecification;
 import com.insightfullogic.lambdabehave.testcases.data_driven.*;
 import org.junit.runner.RunWith;
+import org.scalatest.WrapWith;
 
 import static com.insightfullogic.lambdabehave.BehaveRunner.runOnly;
 import static com.insightfullogic.lambdabehave.Suite.describe;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(JunitSuiteRunner.class)
+@WrapWith(ScalaTestWrapper.class)
 public class DataDrivenSuiteSpec {{
 
     describe("data driven specifications", it -> {

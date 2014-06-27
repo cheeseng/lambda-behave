@@ -5,6 +5,7 @@ import com.insightfullogic.lambdabehave.impl.reports.Report;
 import com.insightfullogic.lambdabehave.impl.reports.SpecificationReport;
 import com.insightfullogic.lambdabehave.impl.reports.SuiteReport;
 import org.junit.runner.RunWith;
+import org.scalatest.WrapWith;
 
 import static com.insightfullogic.lambdabehave.BehaveRunner.runOnly;
 import static com.insightfullogic.lambdabehave.Suite.describe;
@@ -12,6 +13,7 @@ import static com.insightfullogic.lambdabehave.impl.reports.Result.ERROR;
 import static com.insightfullogic.lambdabehave.impl.reports.Result.FAILURE;
 
 @RunWith(JunitSuiteRunner.class)
+@WrapWith(ScalaTestWrapper.class)
 public class TestingRunningSpec {{
 
     describe("lambda behave specifications", it -> {

@@ -4,6 +4,7 @@ import com.insightfullogic.lambdabehave.testcases.fixtures.ShouldSetup;
 import com.insightfullogic.lambdabehave.testcases.fixtures.ShouldSetupMulti;
 import com.insightfullogic.lambdabehave.testcases.fixtures.ShouldSetupNone;
 import org.junit.runner.RunWith;
+import org.scalatest.WrapWith;
 import org.mockito.InOrder;
 
 import static com.insightfullogic.lambdabehave.BehaveRunner.runOnly;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(JunitSuiteRunner.class)
+@WrapWith(ScalaTestWrapper.class)
 public class SpecFixtureSpec {{
 
     describe("lambda behave spec fixtures", it -> {

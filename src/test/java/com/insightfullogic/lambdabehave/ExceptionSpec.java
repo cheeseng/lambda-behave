@@ -8,6 +8,7 @@ import com.insightfullogic.lambdabehave.testcases.exceptions.ExceptionInInitiali
 import com.insightfullogic.lambdabehave.testcases.exceptions.ExceptionInSetup;
 import com.insightfullogic.lambdabehave.testcases.exceptions.ExceptionInTearDown;
 import org.junit.runner.RunWith;
+import org.scalatest.WrapWith;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import static com.insightfullogic.lambdabehave.impl.reports.SpecificationReport.
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(JunitSuiteRunner.class)
+@WrapWith(ScalaTestWrapper.class)
 public class ExceptionSpec {{
 
     describe("lambda behave", it -> {

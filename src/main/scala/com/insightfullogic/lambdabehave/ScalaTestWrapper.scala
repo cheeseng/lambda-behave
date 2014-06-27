@@ -1,0 +1,89 @@
+/*
+ * Copyright 2001-2014 Artima, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.insightfullogic.lambdabehave
+
+import org.scalatest._
+import org.scalatest.lambdabehave.ScalaTestHelper._
+import com.insightfullogic.lambdabehave.impl.reports.Specifiers
+import java.util.stream.Collectors.toList
+import collection.JavaConverters._
+import org.scalatest.events._
+import com.insightfullogic.lambdabehave.impl.reports.Result
+import org.scalatest.exceptions.PayloadField
+
+class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite =>
+
+  val specifier = BehaveRunner.declareOnly(clazz)
+  val children = specifier.completeBehaviours.collect(toList())
+  val childrenMap = Map.empty ++ children.asScala.map(c => c.getDescription -> c)
+
+  override def suiteName: String = specifier.getSuiteName
+
+  override def suiteId: String = clazz.getName
+
+  override def expectedTestCount(filter: Filter): Int = childrenMap.size
+
+  override def testNames: Set[String] = childrenMap.keySet
+
+  override def tags: Map[String, Set[String]] = Map.empty
+
+  override protected def runTest(testName: String, args: Args): Status = {
+
+    if (testName == null)
+      throw new NullPointerException("testName was null")
+    if (args == null)
+      throw new NullPointerException("args was null")
+
+    import args._
+
+    val testStartTime = System.currentTimeMillis
+    reportTestStarting(this, reporter, tracker, testName, testName, rerunner, Some(LineInFile(88, "TODO: How to get the location??")))
+
+    val formatter = getEscapedIndentedTextForTest(testName, 1, true)
+
+    val messageRecorderForThisTest = createMessageRecorder(reporter)
+    val informerForThisTest = createMessageRecordingInformer(thisSuite, reporter, tracker, testName, messageRecorderForThisTest)
+      /*MessageRecordingInformer(
+        messageRecorderForThisTest,
+        (message, payload, isConstructingThread, testWasPending, testWasCanceled, location) => createInfoProvided(thisSuite, reporter, tracker, Some(testName), message, payload, 2, location, isConstructingThread, true)
+      )*/
+
+    val documenterForThisTest = createMessageRecordingDocumenter(thisSuite, reporter, tracker, testName, messageRecorderForThisTest)
+      /*MessageRecordingDocumenter(
+        messageRecorderForThisTest,
+        (message, _, isConstructingThread, testWasPending, testWasCanceled, location) => createMarkupProvided(thisSuite, reporter, tracker, Some(testName), message, 2, location, isConstructingThread) // TODO: Need a test that fails because testWasCanceleed isn't being passed
+      )*/
+
+    childrenMap.get(testName) match {
+      case Some(child) =>
+        val report = child.checkCompleteBehaviour()
+        report.getResult match {
+          case Result.SUCCESS =>
+            val duration = System.currentTimeMillis - testStartTime
+            reportTestSucceeded(thisSuite, reporter, tracker, testName, testName, messageRecorderForThisTest.recordedEvents(false, false), duration, formatter, rerunner, Some(LineInFile(88, "TODO: How to get the location??")))
+            SucceededStatus
+          case Result.FAILURE | Result.ERROR =>
+            val duration = System.currentTimeMillis - testStartTime
+            reporter(TestFailed(tracker.nextOrdinal(), report.getMessage, thisSuite.suiteName, thisSuite.suiteId, Some(thisSuite.getClass.getName), testName, testName, messageRecorderForThisTest.recordedEvents(false, false), None, Some(duration), Some(formatter), Some(LineInFile(88, "TODO: How to get the location??")), thisSuite.rerunner, None))
+            FailedStatus
+        }
+      case None =>
+        throw new IllegalArgumentException("Test '" + testName + "' not found.")
+    }
+
+  }
+
+}

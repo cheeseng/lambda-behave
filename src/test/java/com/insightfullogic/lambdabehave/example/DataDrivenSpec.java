@@ -2,10 +2,13 @@ package com.insightfullogic.lambdabehave.example;
 
 import com.insightfullogic.lambdabehave.JunitSuiteRunner;
 import org.junit.runner.RunWith;
+import com.insightfullogic.lambdabehave.ScalaTestWrapper;
+import org.scalatest.WrapWith;
 
 import static com.insightfullogic.lambdabehave.Suite.describe;
 
 @RunWith(JunitSuiteRunner.class)
+@WrapWith(ScalaTestWrapper.class)
 public class DataDrivenSpec {{
 
     describe("a number", it -> {
