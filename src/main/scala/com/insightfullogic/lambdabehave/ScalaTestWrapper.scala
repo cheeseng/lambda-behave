@@ -27,16 +27,15 @@ import org.scalatest.exceptions.PayloadField
 class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite =>
 
   val specifier = BehaveRunner.declareOnly(clazz)
-  val children = specifier.completeBehaviours.collect(toList())
-  val childrenMap = Map.empty ++ children.asScala.map(c => c.getDescription -> c)
+  val children = specifier.completeBehaviours.collect(toList()).asScala
 
   override def suiteName: String = specifier.getSuiteName
 
   override def suiteId: String = clazz.getName
 
-  override def expectedTestCount(filter: Filter): Int = childrenMap.size
+  override def expectedTestCount(filter: Filter): Int = children.size
 
-  override def testNames: Set[String] = childrenMap.keySet
+  override def testNames: Set[String] = children.map(_.getDescription).toSet
 
   override def tags: Map[String, Set[String]] = Map.empty
 
@@ -49,26 +48,24 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
 
     import args._
 
-    val testStartTime = System.currentTimeMillis
-    reportTestStarting(this, reporter, tracker, testName, testName, rerunner, Some(LineInFile(88, "TODO: How to get the location??")))
+    val testChildren = children.filter(_.getDescription == testName)
 
-    val formatter = getEscapedIndentedTextForTest(testName, 1, true)
+    if (testChildren.length == 0)
+      throw new IllegalArgumentException("Test '" + testName + "' not found.")
 
-    val messageRecorderForThisTest = createMessageRecorder(reporter)
-    val informerForThisTest = createMessageRecordingInformer(thisSuite, reporter, tracker, testName, messageRecorderForThisTest)
-      /*MessageRecordingInformer(
-        messageRecorderForThisTest,
-        (message, payload, isConstructingThread, testWasPending, testWasCanceled, location) => createInfoProvided(thisSuite, reporter, tracker, Some(testName), message, payload, 2, location, isConstructingThread, true)
-      )*/
+    val statusList = 
+      testChildren.map { child =>
+        val testStartTime = System.currentTimeMillis
+        reportTestStarting(this, reporter, tracker, testName, testName, rerunner, Some(LineInFile(88, "TODO: How to get the location??")))
 
-    val documenterForThisTest = createMessageRecordingDocumenter(thisSuite, reporter, tracker, testName, messageRecorderForThisTest)
-      /*MessageRecordingDocumenter(
-        messageRecorderForThisTest,
-        (message, _, isConstructingThread, testWasPending, testWasCanceled, location) => createMarkupProvided(thisSuite, reporter, tracker, Some(testName), message, 2, location, isConstructingThread) // TODO: Need a test that fails because testWasCanceleed isn't being passed
-      )*/
+        val formatter = getEscapedIndentedTextForTest(testName, 1, true)
 
-    childrenMap.get(testName) match {
-      case Some(child) =>
+        val messageRecorderForThisTest = createMessageRecorder(reporter)
+
+        val informerForThisTest = createMessageRecordingInformer(thisSuite, reporter, tracker, testName, messageRecorderForThisTest)
+
+        val documenterForThisTest = createMessageRecordingDocumenter(thisSuite, reporter, tracker, testName, messageRecorderForThisTest)
+
         val report = child.checkCompleteBehaviour()
         report.getResult match {
           case Result.SUCCESS =>
@@ -80,10 +77,9 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
             reporter(TestFailed(tracker.nextOrdinal(), report.getMessage, thisSuite.suiteName, thisSuite.suiteId, Some(thisSuite.getClass.getName), testName, testName, messageRecorderForThisTest.recordedEvents(false, false), None, Some(duration), Some(formatter), Some(LineInFile(88, "TODO: How to get the location??")), thisSuite.rerunner, None))
             FailedStatus
         }
-      case None =>
-        throw new IllegalArgumentException("Test '" + testName + "' not found.")
-    }
+      }
 
+    new CompositeStatus(statusList.toSet)
   }
 
 }
