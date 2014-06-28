@@ -14,17 +14,17 @@ public final class SpecificationReport {
     private final String message;
 
     public static SpecificationReport success(String description) {
-        log.info(description + " has succeeded");
+        //log.info(description + " has succeeded");
         return new SpecificationReport(description);
     }
 
     public static SpecificationReport failure(String description, AssertionError cause) {
-        log.warn(description + " has failed");
+        //log.warn(description + " has failed");
         return new SpecificationReport(description, Result.FAILURE, cause.getMessage());
     }
 
     public static SpecificationReport error(String specification, Throwable cause) {
-        log.warn(specification + " has finished in error");
+        //log.warn(specification + " has finished in error");
         return new SpecificationReport(specification, Result.ERROR, cause.getMessage());
     }
 
