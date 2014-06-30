@@ -70,7 +70,7 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
         val (filterTest, ignoreTest) = filter(tn, tags, suiteId)
         if (!filterTest) {
           if (ignoreTest)
-            reportTestIgnored(thisSuite, report, tracker, tn, tn, getEscapedIndentedTextForTest(tn, 1, true), Some(LineInFile(88, "TODO: How to get the location??")))
+            reportTestIgnored(thisSuite, report, tracker, tn, tn, getEscapedIndentedTextForTest(tn, 1, true), Some(TopOfClass(clazz.getName)))
           else
             statusBuffer += runTest(tn, newArgs)
         }
@@ -79,7 +79,7 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
         for ((tn, ignoreTest) <- filter(theTestNames, tags, suiteId)) {
           if (!stopRequested()) {
             if (ignoreTest)
-              reportTestIgnored(thisSuite, report, tracker, tn, tn, getEscapedIndentedTextForTest(tn, 1, true), Some(LineInFile(88, "TODO: How to get the location??")))
+              reportTestIgnored(thisSuite, report, tracker, tn, tn, getEscapedIndentedTextForTest(tn, 1, true), Some(TopOfClass(clazz.getName)))
             else
               statusBuffer += runTest(tn, newArgs)
           }
@@ -105,7 +105,7 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
     val statusList = 
       testChildren.map { child =>
         val testStartTime = System.currentTimeMillis
-        reportTestStarting(this, reporter, tracker, testName, testName, rerunner, Some(LineInFile(88, "TODO: How to get the location??")))
+        reportTestStarting(this, reporter, tracker, testName, testName, rerunner, Some(TopOfClass(clazz.getName)))
 
         val formatter = getEscapedIndentedTextForTest(testName, 1, true)
 
@@ -119,11 +119,11 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
         report.getResult match {
           case Result.SUCCESS =>
             val duration = System.currentTimeMillis - testStartTime
-            reportTestSucceeded(thisSuite, reporter, tracker, testName, testName, messageRecorderForThisTest.recordedEvents(false, false), duration, formatter, rerunner, Some(LineInFile(88, "TODO: How to get the location??")))
+            reportTestSucceeded(thisSuite, reporter, tracker, testName, testName, messageRecorderForThisTest.recordedEvents(false, false), duration, formatter, rerunner, Some(TopOfClass(clazz.getName)))
             SucceededStatus
           case Result.FAILURE | Result.ERROR =>
             val duration = System.currentTimeMillis - testStartTime
-            reporter(TestFailed(tracker.nextOrdinal(), report.getMessage, thisSuite.suiteName, thisSuite.suiteId, Some(thisSuite.getClass.getName), testName, testName, messageRecorderForThisTest.recordedEvents(false, false), None, Some(duration), Some(formatter), Some(LineInFile(88, "TODO: How to get the location??")), thisSuite.rerunner, None))
+            reporter(TestFailed(tracker.nextOrdinal(), report.getMessage, thisSuite.suiteName, thisSuite.suiteId, Some(thisSuite.getClass.getName), testName, testName, messageRecorderForThisTest.recordedEvents(false, false), None, Some(duration), Some(formatter), Some(TopOfClass(clazz.getName)), thisSuite.rerunner, None))
             FailedStatus
         }
       }
