@@ -138,4 +138,10 @@ object ScalaTestHelper {
         (message, _, isConstructingThread, testWasPending, testWasCanceled, location) => createMarkupProvided(thisSuite, reporter, tracker, Some(testName), message, 2, location, isConstructingThread) // TODO: Need a test that fails because testWasCanceleed isn't being passed
       )
 
+  def checkChosenStyles(configMap: ConfigMap, styleName: String): Unit = Suite.checkChosenStyles(configMap, styleName)
+
+  def wrapReporterIfNecessary(theSuite: Suite, reporter: Reporter): Reporter = Suite.wrapReporterIfNecessary(theSuite, reporter)
+
+  def reportTestIgnored(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, formatter: Formatter, location: Option[Location]): Unit = 
+    Suite.reportTestIgnored(theSuite, report, tracker, testName, testText, formatter, location)
 }

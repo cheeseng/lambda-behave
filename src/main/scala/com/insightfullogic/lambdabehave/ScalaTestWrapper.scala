@@ -23,6 +23,7 @@ import collection.JavaConverters._
 import org.scalatest.events._
 import com.insightfullogic.lambdabehave.impl.reports.Result
 import org.scalatest.exceptions.PayloadField
+import collection.mutable.ListBuffer
 
 class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite =>
 
@@ -38,6 +39,54 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
   override def testNames: Set[String] = children.map(_.getDescription).toSet
 
   override def tags: Map[String, Set[String]] = Map.empty
+
+  override protected def runTests(testName: Option[String], args: Args): Status = {
+    if (testName == null)
+      throw new NullPointerException("testName was null")
+    if (args == null)
+      throw new NullPointerException("args was null")
+
+    import args._
+
+    val theTestNames = testNames
+    if (theTestNames.size > 0)
+      checkChosenStyles(configMap, styleName)
+
+    val stopRequested = stopper
+
+    // Wrap any non-DispatchReporter, non-CatchReporter in a CatchReporter,
+    // so that exceptions are caught and transformed
+    // into error messages on the standard error stream.
+    val report = wrapReporterIfNecessary(thisSuite, reporter)
+    val newArgs = args.copy(reporter = report)
+    
+    val statusBuffer = new ListBuffer[Status]()
+
+    // If a testName is passed to run, just run that, else run the tests returned
+    // by testNames.
+    testName match {
+
+      case Some(tn) =>
+        val (filterTest, ignoreTest) = filter(tn, tags, suiteId)
+        if (!filterTest) {
+          if (ignoreTest)
+            reportTestIgnored(thisSuite, report, tracker, tn, tn, getEscapedIndentedTextForTest(tn, 1, true), Some(LineInFile(88, "TODO: How to get the location??")))
+          else
+            statusBuffer += runTest(tn, newArgs)
+        }
+
+      case None =>
+        for ((tn, ignoreTest) <- filter(theTestNames, tags, suiteId)) {
+          if (!stopRequested()) {
+            if (ignoreTest)
+              reportTestIgnored(thisSuite, report, tracker, tn, tn, getEscapedIndentedTextForTest(tn, 1, true), Some(LineInFile(88, "TODO: How to get the location??")))
+            else
+              statusBuffer += runTest(tn, newArgs)
+          }
+      }
+    }
+    new CompositeStatus(Set.empty ++ statusBuffer)
+  }
 
   override protected def runTest(testName: String, args: Args): Status = {
 
