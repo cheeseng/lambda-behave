@@ -64,6 +64,11 @@ class ScalaTestWrapperSpec extends FunSpec {
       assert(testSucceededEvents(2).testName == "pop the last element pushed onto the stack")
     }
 
+    it("should return com.insightfullogic.lambdabehave.Suite as style spec") {
+      val s = new ScalaTestWrapper(classOf[StackSpec])
+      assert(s.styleName == "com.insightfullogic.lambdabehave.Suite")
+    }
+
   }
 
 }

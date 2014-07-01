@@ -131,4 +131,6 @@ class ScalaTestWrapper(clazz: Class[_]) extends org.scalatest.Suite { thisSuite 
     new CompositeStatus(statusList.toSet)
   }
 
+  override val styleName: String = "com.insightfullogic.lambdabehave.Suite"
+
 }
